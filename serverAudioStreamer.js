@@ -150,22 +150,34 @@ io.on('connection', function (socket) {
 });
 
 
-const context = require('audio-context')
-const Generator = require('audio-generator')
-const {Readable, Writable} = require('web-audio-stream/stream')
+var audio = require('audio-stream');
  
-let oscillator = context.createOscillator()
-oscillator.type = 'sawtooth'
-oscillator.frequency.value = 440
-oscillator.start()
+navigator.getUserMedia({
+    video: false,
+    audio: true
+}, function(mediaStream) {
+    var stream = audio(mediaStream, {
+        channels: 1,
+        volume: 0.5
+    });
  
-//pipe oscillator audio data to stream
-Readable(oscillator).on('data', (audioBuffer) => {
-    console.log(audioBuffer.getChannelData(0))
-})
+    stream.on('header', function(header) {
+        // Wave header properties
+    });
  
-//pipe generator stream to audio destination
-Generator(time => Math.sin(Math.PI * 2 * time * 440))
-server.pipe(Writable(context.destination))
+    stream.on('data', function(data) {
+        // Data is a Buffer instance (UInt8Array)
+    });
+ 
+    stream.on('end', function() {
+        // End is emitted when media stream has ended
+    });
+ 
+    setTimeout(function() {
+        mediaStream.stop();
+    }, 2000);
+}, function() {
+    console.log('Failed to get media');
+});
 
 server.listen(_port);
