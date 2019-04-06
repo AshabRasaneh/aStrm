@@ -150,34 +150,77 @@ io.on('connection', function (socket) {
 });
 
 
-var audio = require('audio-stream');
- 
-navigator.getUserMedia({
-    video: false,
-    audio: true
-}, function(mediaStream) {
-    var stream = audio(mediaStream, {
-        channels: 1,
-        volume: 0.5
-    });
- 
-    stream.on('header', function(header) {
-        // Wave header properties
-    });
- 
-    stream.on('data', function(data) {
-        // Data is a Buffer instance (UInt8Array)
-    });
- 
-    stream.on('end', function() {
-        // End is emitted when media stream has ended
-    });
- 
-    setTimeout(function() {
-        mediaStream.stop();
-    }, 2000);
-}, function() {
-    console.log('Failed to get media');
-});
 
+//------------------------------------------------------------------------
+// var audio = require('audio-stream');
+ 
+// navigator.getUserMedia({
+//     video: false,
+//     audio: true
+// }, function(mediaStream) {
+//     var stream = audio(mediaStream, {
+//         channels: 1,
+//         volume: 0.5
+//     });
+ 
+//     stream.on('header', function(header) {
+//         // Wave header properties
+//     });
+ 
+//     stream.on('data', function(data) {
+//         // Data is a Buffer instance (UInt8Array)
+//     });
+ 
+//     stream.on('end', function() {
+//         // End is emitted when media stream has ended
+//     });
+ 
+//     setTimeout(function() {
+//         mediaStream.stop();
+//     }, 2000);
+// }, function() {
+//     console.log('Failed to get media');
+// });
+
+
+
+//************************************************************************ */
+var http = require('http'),
+    url = require('url'),
+    fs   = require('fs'),
+    filePath = '/home/risto/Downloads/oleg.mp4',
+    stat = fs.statSync(filePath);
+
+http.createServer(function(request, response) {        
+    const fileSize = stat.size;
+    const range = request.headers.range;
+    if (range) {
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] 
+        ? parseInt(parts[1], 10)
+        : fileSize - 1;
+      const chunksize = (end - start) + 1;
+      const readStream = fs.createReadStream(filePath, { start, end });
+      const head = {
+        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunksize,
+        'Content-Type': 'video/mp4',
+      };
+      response.writeHead(206, head);
+      readStream.pipe(response);
+    } else {
+      const head = {
+        'Content-Length': fileSize,
+        'Content-Type': 'video/mp4',
+      };
+      response.writeHead(200, head);
+      fs.createReadStream(filePath).pipe(response);
+    }
+})
+
+
+
+//---------------------------------------------
 server.listen(_port);
