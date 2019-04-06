@@ -152,35 +152,35 @@ io.on('connection', function (socket) {
 
 
 //------------------------------------------------------------------------
-// var audio = require('audio-stream');
+var audio = require('audio-stream');
  
-// navigator.getUserMedia({
-//     video: false,
-//     audio: true
-// }, function(mediaStream) {
-//     var stream = audio(mediaStream, {
-//         channels: 1,
-//         volume: 0.5
-//     });
+navigator.getUserMedia({
+    video: false,
+    audio: true
+}, function(mediaStream) {
+    var stream = audio(mediaStream, {
+        channels: 1,
+        volume: 0.5
+    });
  
-//     stream.on('header', function(header) {
-//         // Wave header properties
-//     });
+    stream.on('header', function(header) {
+        // Wave header properties
+    });
  
-//     stream.on('data', function(data) {
-//         // Data is a Buffer instance (UInt8Array)
-//     });
+    stream.on('data', function(data) {
+        // Data is a Buffer instance (UInt8Array)
+    });
  
-//     stream.on('end', function() {
-//         // End is emitted when media stream has ended
-//     });
+    stream.on('end', function() {
+        // End is emitted when media stream has ended
+    });
  
-//     setTimeout(function() {
-//         mediaStream.stop();
-//     }, 2000);
-// }, function() {
-//     console.log('Failed to get media');
-// });
+    setTimeout(function() {
+        mediaStream.stop();
+    }, 2000);
+}, function() {
+    console.log('Failed to get media');
+});
 
 
 //---------------------------------------------
